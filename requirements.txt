@@ -1,0 +1,6 @@
+Flask
+Flask-PyMongo
+Flask-Marshmallow
+pymongo
+marshmallow
+python-dotenv
