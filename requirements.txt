@@ -4,3 +4,4 @@ Flask-Marshmallow
 pymongo
 marshmallow
 python-dotenv
+python-dateutil
