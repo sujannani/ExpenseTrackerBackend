@@ -4,6 +4,7 @@ from models.user_model import user_model
 
 obj=user_model()
 
+
 @app.route('/users/signup',methods=["POST"])
 def user_signup_controller():
     return obj.user_signup_model(request.form.to_dict())
