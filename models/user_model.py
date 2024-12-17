@@ -9,7 +9,7 @@ class user_model:
             user_data['password'] = hashed_password
             user_data['totalAmount']=0
             user=mongo.db.users.insert_one(user_data)
-            return {'id':str(user.inserted_id),'message':'User created Successfully'}
+            return {'id':str(user.inserted_id),'message':'success'}
         except Exception as e:
             return {'message':f"something went wrong{e}"}
     
@@ -18,7 +18,7 @@ class user_model:
             user = mongo.db.users.find_one({'email': user_data['email']})
             if user:
                 if bcrypt.check_password_hash(user['password'], user_data['password']):
-                    return {"message":"ok","user":{
+                    return {"message":"success","user":{
                         'id':str(user['_id']),
                         'name':user['name'],
                         'email':user['email'],
