@@ -3,6 +3,7 @@ click==8.1.7
 colorama==0.4.6
 dnspython==2.6.1
 flask==3.0.3
+flask_bcrypt
 flask-marshmallow==1.2.1
 Flask-PyMongo==2.3.0
 importlib-metadata==8.4.0

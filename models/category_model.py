@@ -12,10 +12,11 @@ class category_model:
             })
             if existing_category:
                 return {'message':'Name or emoji already existed'}
+            category_data['active']=True
             category=mongo.db.categories.insert_one(category_data)
-            return {'message':'ok','category_id':str(category.inserted_id)}
+            return {'message':'Category added successfully','category_id':str(category.inserted_id)}
         except Exception as e:
-            return {"message":'not ok','error':str(e)}
+            return {"message":f'something went wrong {e}'}
     
     def get_categories_model(self,user_id):
         try:
@@ -23,25 +24,50 @@ class category_model:
             for cat in categories:
                 cat['_id']=str(cat['_id'])
             return {'categories':categories}
-        except Exception as e:
-            return {'message':'not ok','error':str(e)}
+        except Exception as e: 
+            return {'message':f'{e}','categories':{}}
     
-    def edit_category_model(self,category_data):
+    def delete_category_model(self,category_data):
+        try:
+            existing_category=mongo.db.categories.find_one({
+                '_id':ObjectId(category_data['category_id'])
+            })
+            if not existing_category:
+                return {'message':"Category not found"}
+            result=mongo.db.categories.update_one(
+                {'_id':ObjectId(category_data['category_id'])},
+                {'$set':{'active':False}}
+            )
+            if result.matched_count==0:
+                return {'message':'failed to delete'}
+            return {'message':'Category deleted successfully'}
+        except Exception as e:
+            return {'message':f'{e}'}
+
+    def edit_category_model(self, category_data):
         try:
             existing_category = mongo.db.categories.find_one({
-                'user_id':category_data['user_id'],
-                '$and': [
+                'user_id': category_data['user_id'],
+                'active':True,
+                '$or': [
                     {'category_name': category_data['category_name']},
                     {'emoji': category_data['emoji']}
-                ]
+                ],
+                '_id': {'$ne': ObjectId(category_data['category_id'])}
             })
             if existing_category:
-                return {'message':'Name or emoji already existed'}
-            result = mongo.db.categories.update_one(
-                {'_id': ObjectId(category_data['category_id'])},
-                {'$set': {'emoji': category_data['emoji'], 'category_name': category_data['category_name']}}
+                return {'message': 'Name or emoji already existed'}
+            update_result = mongo.db.categories.update_one(
+                {'_id': ObjectId(category_data['category_id']), 'user_id': category_data['user_id']},
+                {'$set': {
+                    'category_name': category_data['category_name'],
+                    'emoji': category_data['emoji'],
+                }}
             )
-            return {'message':'ok'}
+            if update_result.matched_count == 0:
+                return {'message': 'Category not found'}
+            return {'message': 'Category updated successfully'}
         except Exception as e:
-            return {'message':str(e)}
-            
+            return {'message': f'Something went wrong: {e}'}
+
+                

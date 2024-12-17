@@ -11,3 +11,7 @@ def add_transaction_controller():
 @app.route('/transactions/get_monthly_transactions',methods=["POST"])
 def get_monthly_transactions_controller():
     return obj.get_monthly_transactions_model(request.form.to_dict())
+
+@app.route('/transactions/get_category_monthly_transactions',methods=['POST'])
+def get_category_monthly_transactions_controller():
+    return obj.get_category_monthly_transactions_model(request.form.to_dict())

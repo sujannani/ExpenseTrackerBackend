@@ -13,4 +13,3 @@ def user_signup_controller():
 def user_login_controller():
     print(request.form.to_dict())
     return obj.user_login_model(request.form.to_dict())
-

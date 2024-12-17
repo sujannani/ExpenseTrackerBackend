@@ -1,11 +1,15 @@
 from flask import Flask # type: ignore
 from flask_pymongo import PyMongo # type: ignore
-from config import Config
+from dotenv import load_dotenv
+from flask_bcrypt import Bcrypt
 import os
-app = Flask(__name__)
-app.config.from_object(Config)
 
+load_dotenv()
+
+app = Flask(__name__)
+app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 mongo = PyMongo(app)
+bcrypt=Bcrypt()
 
 @app.route("/")
 def index():
