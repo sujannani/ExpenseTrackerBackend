@@ -4,7 +4,7 @@ class user_model:
         try:
             existing_user = mongo.db.users.find_one({'email': user_data['email']})
             if existing_user:
-                return {'status': 'Email already exists'}
+                return {'message': 'Email already exists'}
             hashed_password = bcrypt.generate_password_hash(user_data['password']).decode('utf-8')
             user_data['password'] = hashed_password
             user_data['totalAmount']=0
@@ -18,7 +18,7 @@ class user_model:
             user = mongo.db.users.find_one({'email': user_data['email']})
             if user:
                 if bcrypt.check_password_hash(user['password'], user_data['password']):
-                    return {"status":"ok","user":{
+                    return {"message":"ok","user":{
                         'id':str(user['_id']),
                         'name':user['name'],
                         'email':user['email'],
