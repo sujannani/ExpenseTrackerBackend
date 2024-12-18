@@ -6,12 +6,12 @@ obj=transaction_model()
 
 @app.route('/transactions/add_transaction',methods=["POST"])
 def add_transaction_controller():
-    return obj.add_transaction_model(request.form.to_dict())
+    return obj.add_transaction_model(request.get_json())
 
 @app.route('/transactions/get_monthly_transactions',methods=["POST"])
 def get_monthly_transactions_controller():
-    return obj.get_monthly_transactions_model(request.form.to_dict())
+    return obj.get_monthly_transactions_model(request.get_json())
 
 @app.route('/transactions/get_category_monthly_transactions',methods=['POST'])
 def get_category_monthly_transactions_controller():
-    return obj.get_category_monthly_transactions_model(request.form.to_dict())
+    return obj.get_category_monthly_transactions_model(request.get_json())

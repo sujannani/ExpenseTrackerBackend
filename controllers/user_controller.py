@@ -7,9 +7,8 @@ obj=user_model()
 
 @app.route('/users/signup',methods=["POST"])
 def user_signup_controller():
-    return obj.user_signup_model(request.form.to_dict())
+    return obj.user_signup_model(request.get_json())
 
 @app.route('/users/login',methods=["POST"])
 def user_login_controller():
-    print(request.form.to_dict())
-    return obj.user_login_model(request.form.to_dict())
+    return obj.user_login_model(request.get_json())
