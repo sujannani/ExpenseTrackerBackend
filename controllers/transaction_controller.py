@@ -16,3 +16,6 @@ def get_monthly_transactions_controller():
 def get_category_monthly_transactions_controller():
     return obj.get_category_monthly_transactions_model(request.get_json())
 
+@app.route('/transactions/get_recent_transactions',methods=["POST"])
+def get_recent_transactions_controller():
+    return obj.get_recent_transactions_model(request.get_json())
