@@ -18,9 +18,9 @@ class category_model:
         except Exception as e:
             return {"message":f'something went wrong {e}'}
     
-    def get_categories_model(self,user_id):
+    def get_categories_model(self,user_data):
         try:
-            categories=list(mongo.db.categories.find({'user_id': user_id}))
+            categories=list(mongo.db.categories.find({'user_id': user_data['user_id']}))
             for cat in categories:
                 cat['_id']=str(cat['_id'])
             return {'categories':categories,'message':"success"}

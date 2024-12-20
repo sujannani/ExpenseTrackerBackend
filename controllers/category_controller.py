@@ -8,9 +8,9 @@ obj=category_model()
 def add_category_controller():
     return obj.add_category_model(request.get_json())
 
-@app.route('/category/<id>/get_categories')
-def get_categories_model(id):
-    return obj.get_categories_model(id)
+@app.route('/category/get_categories')
+def get_categories_model():
+    return obj.get_categories_model(request.get_json())
 
 @app.route('/category/edit_category',methods=["POST"])
 def edit_category_controller():
