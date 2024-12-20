@@ -1,4 +1,7 @@
+from bson import ObjectId
 from app import mongo,bcrypt
+from datetime import datetime, timezone
+
 class user_model:
     def user_signup_model(self,user_data):
         try:
@@ -8,6 +11,7 @@ class user_model:
             hashed_password = bcrypt.generate_password_hash(user_data['password']).decode('utf-8')
             user_data['password'] = hashed_password
             user_data['totalAmount']=0
+            user_data['signupDate']=datetime.now(timezone.utc).isoformat()
             user=mongo.db.users.insert_one(user_data)
             return {'id':str(user.inserted_id),'message':'success'}
         except Exception as e:

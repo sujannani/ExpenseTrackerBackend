@@ -1,11 +1,11 @@
-from dateutil import parser
-from datetime import datetime,timedelta
+from bson import ObjectId
+from datetime import datetime,timedelta,timezone
 import dateutil.parser
 from app import mongo
 class transaction_model:
     def add_transaction_model(self,transaction_data):
         try:
-            transaction_data['date'] = parser.isoparse(transaction_data['date'])
+            transaction_data['date'] = datetime.now(timezone.utc).isoformat()
             transaction_data['amount'] = float(transaction_data['amount'])
             transaction=mongo.db.transactions.insert_one(transaction_data)
             return {"message":'success','transaction_id':str(transaction.inserted_id)}
@@ -16,6 +16,12 @@ class transaction_model:
         try:
             start_date =dateutil.parser.parse(input_data['start_date'])
             end_date = dateutil.parser.parse(input_data['end_date'])
+            user = mongo.db.users.find_one({'_id': ObjectId(input_data['user_id'])})
+            created_at = user.get('createdAt')
+            created_at=created_at.replace(tzinfo=timezone.utc)
+            if end_date < created_at:
+                return {'message': 'No more transactions available'}
+
             transactions = list(mongo.db.transactions.find({
                 'user_id': input_data['user_id'],
                 'date': {
@@ -29,7 +35,7 @@ class transaction_model:
             for transaction in transactions:
                 transaction['_id']=str(transaction['_id'])
                 transaction['date'] = (transaction['date'] + timedelta(hours=offset_hours, minutes=offset_minutes)).isoformat()
-            return {'transactions':transactions,'message':'success'}
+            return {"monthly_transactions":{'transactions':transactions,'date':input_data['start_date']},'message':'success'}
         except Exception as e:
             return {'message':str(e)}
     
@@ -37,6 +43,11 @@ class transaction_model:
         try:
             start_date = dateutil.parser.parse(input_data['start_date'])
             end_date = dateutil.parser.parse(input_data['end_date'])
+            user = mongo.db.users.find_one({'_id': ObjectId(input_data['user_id'])})
+            created_at = user.get('createdAt')
+            created_at=created_at.replace(tzinfo=timezone.utc)
+            if end_date < created_at:
+                return {'message': 'No more transactions available'}
             transactions = list(mongo.db.transactions.aggregate([
                 {
                     '$match': {
