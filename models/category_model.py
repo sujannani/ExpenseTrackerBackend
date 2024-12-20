@@ -14,7 +14,7 @@ class category_model:
                 return {'message':'Name or emoji already existed'}
             category_data['active']=True
             category=mongo.db.categories.insert_one(category_data)
-            return {'message':'Category added successfully','category_id':str(category.inserted_id)}
+            return {'message':'success','category_id':str(category.inserted_id)}
         except Exception as e:
             return {"message":f'something went wrong {e}'}
     
@@ -23,7 +23,7 @@ class category_model:
             categories=list(mongo.db.categories.find({'user_id': user_id}))
             for cat in categories:
                 cat['_id']=str(cat['_id'])
-            return {'categories':categories}
+            return {'categories':categories,'message':"success"}
         except Exception as e: 
             return {'message':f'{e}','categories':{}}
     
@@ -40,7 +40,7 @@ class category_model:
             )
             if result.matched_count==0:
                 return {'message':'failed to delete'}
-            return {'message':'Category deleted successfully'}
+            return {'message':'success'}
         except Exception as e:
             return {'message':f'{e}'}
 
@@ -66,7 +66,7 @@ class category_model:
             )
             if update_result.matched_count == 0:
                 return {'message': 'Category not found'}
-            return {'message': 'Category updated successfully'}
+            return {'message': 'success'}
         except Exception as e:
             return {'message': f'Something went wrong: {e}'}
 
