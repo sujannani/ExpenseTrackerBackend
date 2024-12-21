@@ -5,12 +5,13 @@ from app import mongo
 class transaction_model:
     def add_transaction_model(self,transaction_data):
         try:
-            transaction_data['date'] = datetime.now(timezone.utc).isoformat()
+            transaction_data['date'] = datetime.now(timezone.utc)
             transaction_data['amount'] = float(transaction_data['amount'])
             transaction=mongo.db.transactions.insert_one(transaction_data)
             return {"message":'success','transaction_id':str(transaction.inserted_id)}
         except Exception as e:
-            return {'message':str(e)}
+            print(f"error is {e}")
+            return {'message':f'wrong is e'}
     
     def get_monthly_transactions_model(self,input_data):
         try:
