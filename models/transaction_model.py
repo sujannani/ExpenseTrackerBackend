@@ -59,7 +59,16 @@ class transaction_model:
                 {
                     '$group': {
                         '_id': '$category_id',
-                        'total_cost': {'$sum': '$amount'}
+                        'total_cost': {
+                            '$sum': {
+                                '$cond': [
+                                    {'$eq': ['$type', 'credit']},
+                                    '$amount',                    
+                                    {'$multiply': ['$amount', -1]} 
+                                ]
+                            }
+                        },
+                        'count': {'$sum': 1}
                     }
                 }
             ]))            
