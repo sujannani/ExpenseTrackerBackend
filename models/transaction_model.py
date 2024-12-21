@@ -72,7 +72,7 @@ class transaction_model:
                     }
                 }
             ]))            
-            return {'message':"success",'category_transactions': transactions}
+            return {'message':"success",'category_monthly_transactions':{"category_transactions":transactions,'date':input_data['start_date']}}
         except Exception as e:
             return {'message':str(e)}
     
