@@ -11,7 +11,7 @@ class user_model:
             hashed_password = bcrypt.generate_password_hash(user_data['password']).decode('utf-8')
             user_data['password'] = hashed_password
             user_data['totalAmount']=0
-            user_data['createdAt']=datetime.now(timezone.utc).isoformat()
+            user_data['createdAt']=datetime.now(timezone.utc)
             user=mongo.db.users.insert_one(user_data)
             return {'id':str(user.inserted_id),'message':'success'}
         except Exception as e:
