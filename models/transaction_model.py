@@ -8,6 +8,13 @@ class transaction_model:
             transaction_data['date'] = datetime.now(timezone.utc)
             transaction_data['amount'] = float(transaction_data['amount'])
             transaction=mongo.db.transactions.insert_one(transaction_data)
+            update_value = transaction_data['amount'] if transaction_data['type'] == "credit" else -transaction_data['amount']
+            update_result = mongo.db.users.update_one(
+                {'_id': ObjectId(transaction_data['user_id'])},
+                {'$inc': {'totalAmount': update_value}}
+            )
+            if update_result.matched_count==0:
+                return {'message':"can't update total amount"}
             return {"message":'success','transaction_id':str(transaction.inserted_id)}
         except Exception as e:
             print(f"error is {e}")
@@ -81,6 +88,8 @@ class transaction_model:
             recent_transactions = list(mongo.db.transactions.find({
                 "user_id": user_data['user_id']
             }).sort("date", -1).limit(5))
+            user = mongo.db.users.find_one({'_id': ObjectId(user_data['user_id'])})
+            total_amount = user.get('totalAmount')
             start_date_parsed = dateutil.parser.parse(user_data['date'])
             timezone_offset = start_date_parsed.utcoffset()
             offset_hours = timezone_offset.seconds // 3600
@@ -88,6 +97,6 @@ class transaction_model:
             for transaction in recent_transactions:
                 transaction["_id"] = str(transaction["_id"])
                 transaction['date'] = (transaction['date'] + timedelta(hours=offset_hours, minutes=offset_minutes)).isoformat()
-            return {"message":"success",'transactions':recent_transactions}
+            return {"message":"success",'transactions':recent_transactions,'total_amount':total_amount}
         except Exception as e:
             return {'message':str(e)}
