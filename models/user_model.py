@@ -33,4 +33,22 @@ class user_model:
         except Exception as e:
             return {'message':f'{e}','user':{}}
     
-    
+    def user_edit_profile_model(self,user_data):
+        try:
+            existing_user = mongo.db.users.find_one(
+                {'email': user_data['email'], '_id': {'$ne': ObjectId(user_data['user_id'])}}
+            )
+            if existing_user:
+                return {"message": "Email already exists"}
+            update_result = mongo.db.users.update_one(
+                {'_id': ObjectId(user_data['user_id'])},
+                {'$set': {
+                    'name': user_data['name'],
+                    'email': user_data['email']
+                }}
+            )
+            if update_result.matched_count == 0:
+                return {"message": "User not found"}
+            return {"message": "success"}
+        except Exception as e:
+            return {"message": f"Error: {e}"}
