@@ -100,3 +100,31 @@ class transaction_model:
             return {"message":"success",'transactions':recent_transactions,'total_amount':total_amount}
         except Exception as e:
             return {'message':str(e)}
+        
+    def delete_transaction_model(self,transaction_data):
+        try:
+            result=mongo.db.transactions.delete_one({'_id':ObjectId(transaction_data['transaction_id'])})
+            if result.deleted_count==0:
+                return {'message':"transaction not found"}
+            return {'message':'success'}
+        except Exception as e:
+            return {'message':str(e)} 
+
+    def edit_transaction_model(self,transaction_data):
+        try:
+            update_data = {
+                "description": transaction_data["description"],
+                "amount": float(transaction_data["amount"]),
+                "type": transaction_data["type"],
+                "category_id": transaction_data["category_id"],
+                "date": datetime.now(timezone.utc)
+            }
+            result = mongo.db.transactions.update_one(
+                {"_id": ObjectId(transaction_data['transaction_id']),"user_id":transaction_data['user_id']},
+                {"$set":update_data}
+            )
+            if result.matched_count==0:
+                return {"message":"fail"}
+            return {'message':'success'}
+        except Exception as e:
+            return {'message':str(e)}

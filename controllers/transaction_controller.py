@@ -19,3 +19,11 @@ def get_category_monthly_transactions_controller():
 @app.route('/transactions/get_recent_transactions',methods=["POST"])
 def get_recent_transactions_controller():
     return obj.get_recent_transactions_model(request.get_json())
+
+@app.route('/transactions/edit_transaction',methods=['POST'])
+def edit_transaction_controller():
+    return obj.edit_transaction_model(request.get_json())
+
+@app.route('/transactions/delete_transaction',methods=["POST"])
+def delete_transaction_controller():
+    return obj.delete_transaction_model(request.get_json())
