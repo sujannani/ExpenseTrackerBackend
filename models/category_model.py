@@ -20,7 +20,7 @@ class category_model:
     
     def get_categories_model(self,user_data):
         try:
-            categories=list(mongo.db.categories.find({'user_id': user_data['user_id'],'active':True}))
+            categories=list(mongo.db.categories.find({'user_id': user_data['user_id']}))
             for cat in categories:
                 cat['_id']=str(cat['_id'])
             return {'categories':categories,'message':"success"}
