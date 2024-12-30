@@ -5,6 +5,7 @@ class category_model:
         try:
             existing_category = mongo.db.categories.find_one({
                 'user_id':category_data['user_id'],
+                'active':True,
                 '$or': [
                     {'category_name': category_data['category_name']},
                     {'emoji': category_data['emoji']}
