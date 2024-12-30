@@ -103,7 +103,18 @@ class transaction_model:
         
     def delete_transaction_model(self,transaction_data):
         try:
+            transaction = self.mongo.db.transactions.find_one({'_id': ObjectId(transaction_data['transaction_id'])})
+            if not transaction:
+                return {'message': "Transaction not found"}
+            amount = transaction['amount']
+            if transaction['type']=="credit":
+                amount=-amount
+            user_id = transaction_data['user_id']
             result=mongo.db.transactions.delete_one({'_id':ObjectId(transaction_data['transaction_id'])})
+            amount_update=mongo.db.users.update_one(
+                {"_id":ObjectId(user_id)},
+                {'$inc': {'totalAmount': amount}}
+            )
             if result.deleted_count==0:
                 return {'message':"transaction not found"}
             return {'message':'success'}
@@ -112,6 +123,18 @@ class transaction_model:
 
     def edit_transaction_model(self,transaction_data):
         try:
+            transaction=mongo.db.transactions.find_one({"_id":ObjectId(transaction_data['transaction_id'])})
+            if not transaction:
+                return {"message":"Transaction not found"}
+            amount=transaction['amount']
+            type=transaction['type']
+            if type=="credit":
+                amount=-amount 
+            if transaction_data['type']=='credit':
+                amount+=float(transaction_data['amount'])
+            else:
+                amount-=float(transaction_data['amount'])
+            mongo.db.users.update_one({"_id":ObjectId(transaction_data['user_id'])},{'$inc':{"totalAmount":amount}})
             update_data = {
                 "description": transaction_data["description"],
                 "amount": float(transaction_data["amount"]),
