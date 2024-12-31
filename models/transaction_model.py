@@ -103,7 +103,7 @@ class transaction_model:
         
     def delete_transaction_model(self,transaction_data):
         try:
-            transaction = self.mongo.db.transactions.find_one({'_id': ObjectId(transaction_data['transaction_id'])})
+            transaction = mongo.db.transactions.find_one({'_id': ObjectId(transaction_data['transaction_id'])})
             if not transaction:
                 return {'message': "Transaction not found"}
             amount = transaction['amount']
