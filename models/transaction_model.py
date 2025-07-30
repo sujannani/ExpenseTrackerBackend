@@ -140,7 +140,7 @@ class transaction_model:
                 "amount": float(transaction_data["amount"]),
                 "type": transaction_data["type"],
                 "category_id": transaction_data["category_id"],
-                "date": datetime.now(timezone.utc)
+                "date": transaction_data["date"]
             }
             result = mongo.db.transactions.update_one(
                 {"_id": ObjectId(transaction_data['transaction_id']),"user_id":transaction_data['user_id']},
