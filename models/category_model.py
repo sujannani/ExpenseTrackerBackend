@@ -2,6 +2,7 @@ from app import mongo
 from bson import ObjectId # type: ignore
 class category_model:
     def add_category_model(self,category_data):
+        print(category_data)
         try:
             existing_category = mongo.db.categories.find_one({
                 'user_id':category_data['user_id'],
@@ -63,6 +64,8 @@ class category_model:
                 {'$set': {
                     'category_name': category_data['category_name'],
                     'emoji': category_data['emoji'],
+                    'type': category_data['type'],
+                    'budget': category_data['budget'],
                 }}
             )
             if update_result.matched_count == 0:

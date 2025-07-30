@@ -3,11 +3,11 @@ from flask_pymongo import PyMongo # type: ignore
 from dotenv import load_dotenv
 from flask_bcrypt import Bcrypt
 import os
-
 load_dotenv()
 
 app = Flask(__name__)
 app.config["MONGO_URI"] = os.getenv("MONGO_URI")
+
 mongo = PyMongo(app)
 bcrypt=Bcrypt()
 
