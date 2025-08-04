@@ -5,7 +5,7 @@ from app import mongo
 class transaction_model:
     def add_transaction_model(self,transaction_data):
         try:
-            transaction_data['date'] = datetime.now(timezone.utc)
+            transaction_data['date'] = dateutil.parser.parse(transaction_data['date'])
             transaction_data['amount'] = float(transaction_data['amount'])
             transaction=mongo.db.transactions.insert_one(transaction_data)
             update_value = transaction_data['amount'] if transaction_data['type'] == "credit" else -transaction_data['amount']
@@ -17,9 +17,8 @@ class transaction_model:
                 return {'message':"can't update total amount"}
             return {"message":'success','transaction_id':str(transaction.inserted_id)}
         except Exception as e:
-            print(f"error is {e}")
-            return {'message':f'wrong is e'}
-    
+            return {'message':f'wrong is {e}'}
+
     def get_monthly_transactions_model(self,input_data):
         try:
             start_date =dateutil.parser.parse(input_data['start_date'])
@@ -128,6 +127,7 @@ class transaction_model:
                 return {"message":"Transaction not found"}
             amount=transaction['amount']
             type=transaction['type']
+            date = dateutil.parser.parse(transaction_data['date'])
             if type=="credit":
                 amount=-amount 
             if transaction_data['type']=='credit':
@@ -140,7 +140,7 @@ class transaction_model:
                 "amount": float(transaction_data["amount"]),
                 "type": transaction_data["type"],
                 "category_id": transaction_data["category_id"],
-                "date": transaction_data["date"]
+                "date": date
             }
             result = mongo.db.transactions.update_one(
                 {"_id": ObjectId(transaction_data['transaction_id']),"user_id":transaction_data['user_id']},
