@@ -11,9 +11,9 @@ class user_model:
             hashed_password = bcrypt.generate_password_hash(user_data['password']).decode('utf-8')
             user_data['password'] = hashed_password
             user_data['totalAmount']=0.0
-            user_data['createdAt']=datetime.now(timezone.utc)
+            user_data['createdAt']=datetime(datetime.now().year,datetime.now().month,1)
             user=mongo.db.users.insert_one(user_data)
-            return {'id':str(user.inserted_id),'message':'success'}
+            return {'id':str(user.inserted_id),'createdAt':str(user_data['createdAt']),'message':'success'}
         except Exception as e:
             return {'message':f"something went wrong{e}"}
     
@@ -26,7 +26,8 @@ class user_model:
                         'id':str(user['_id']),
                         'name':user['name'],
                         'email':user['email'],
-                        'totalAmount':user['totalAmount']
+                        'totalAmount':user['totalAmount'],
+                        'createdAt':str(user['createdAt'])
                     }}
                 return {"message": "Invalid credentials", "user": {}}
             return {"message":"User not found","user":{}}
