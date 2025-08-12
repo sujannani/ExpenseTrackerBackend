@@ -94,62 +94,55 @@ class transaction_model:
             if end_date < created_at:
                 return {'message': 'No more transactions available'}
             temp=mongo.db.transactions.find_one({'date':current_date})
-            transactions = list(mongo.db.transactions.aggregate([
+            budget_details = list(mongo.db.transactions.aggregate([
                 {
                     '$match': {
                         'user_id': input_data['user_id']
                     }
                 },
                 {
-                    '$facet': {
-                        'monthly': [
-                            {
-                                '$match': {
-                                    'date': {'$gte': start_date, '$lt': end_date}
-                                }
-                            },
-                            {
-                                '$group': {
-                                    '_id': '$category_id',
-                                    'total_cost': {
-                                        '$sum': {
-                                            '$cond': [
-                                                {'$eq': ['$type', 'credit']},
-                                                '$amount',
-                                                {'$multiply': ['$amount', -1]}
-                                            ]
-                                        }
+                    '$group': {
+                        '_id': '$category_id',
+                        'total_cost': {
+                            '$sum': {
+                                '$cond': [
+                                    {
+                                        '$and': [
+                                            {'$gte': ['$date', start_date]},
+                                            {'$lt': ['$date', end_date]}
+                                        ]
                                     },
-                                    'count': {'$sum': 1}
-                                }
-                            }
-                        ],
-                        'current_day': [
-                            {
-                                '$match': {
-                                    'date': current_date
-                                }
-                            },
-                            {
-                                '$group': {
-                                    '_id': '$category_id',
-                                    'total_cost': {
-                                        '$sum': {
-                                            '$cond': [
-                                                {'$eq': ['$type', 'credit']},
-                                                '$amount',
-                                                {'$multiply': ['$amount', -1]}
-                                            ]
-                                        }
+                                    {
+                                        '$cond': [
+                                            {'$eq': ['$type', 'credit']},
+                                            '$amount',
+                                            {'$multiply': ['$amount', -1]}
+                                        ]
                                     },
-                                    'count': {'$sum': 1}
-                                }
+                                    0
+                                ]
                             }
-                        ]
+                        },
+                        'current_day': {
+                            '$sum': {
+                                '$cond': [
+                                    {'$eq': ['$date', current_date]},
+                                    {
+                                        '$cond': [
+                                            {'$eq': ['$type', 'credit']},
+                                            '$amount',
+                                            {'$multiply': ['$amount', -1]}
+                                        ]
+                                    },
+                                    0
+                                ]
+                            }
+                        }
                     }
                 }
-            ]))           
-            return {'message':"success",'budget_details':{"budget":transactions,'date':input_data['start_date']}}
+            ]))
+
+            return {'message':"success",'monthly_budget_details':{"budget_details":budget_details,'date':input_data['start_date']}}
         except Exception as e:
             return {'message':str(e)}
         
