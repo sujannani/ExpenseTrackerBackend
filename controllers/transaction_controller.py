@@ -27,3 +27,7 @@ def edit_transaction_controller():
 @app.route('/transactions/delete_transaction',methods=["POST"])
 def delete_transaction_controller():
     return obj.delete_transaction_model(request.get_json())
+
+@app.route('/transactions/get_budget_details',methods=["POST"])
+def get_budget_details_controller():
+    return obj.get_budget_details_model(request.get_json())

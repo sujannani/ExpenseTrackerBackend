@@ -81,6 +81,78 @@ class transaction_model:
             return {'message':"success",'category_monthly_transactions':{"category_transactions":transactions,'date':input_data['start_date']}}
         except Exception as e:
             return {'message':str(e)}
+        
+
+    def get_budget_details_model(self,input_data):
+        try:
+            start_date = dateutil.parser.parse(input_data['start_date'])
+            end_date = dateutil.parser.parse(input_data['end_date'])
+            current_date=dateutil.parser.parse(input_data['current_date'])
+            user = mongo.db.users.find_one({'_id': ObjectId(input_data['user_id'])})
+            created_at = user.get('createdAt')
+            created_at=created_at.replace(tzinfo=timezone.utc)
+            if end_date < created_at:
+                return {'message': 'No more transactions available'}
+            temp=mongo.db.transactions.find_one({'date':current_date})
+            transactions = list(mongo.db.transactions.aggregate([
+                {
+                    '$match': {
+                        'user_id': input_data['user_id']
+                    }
+                },
+                {
+                    '$facet': {
+                        'monthly': [
+                            {
+                                '$match': {
+                                    'date': {'$gte': start_date, '$lt': end_date}
+                                }
+                            },
+                            {
+                                '$group': {
+                                    '_id': '$category_id',
+                                    'total_cost': {
+                                        '$sum': {
+                                            '$cond': [
+                                                {'$eq': ['$type', 'credit']},
+                                                '$amount',
+                                                {'$multiply': ['$amount', -1]}
+                                            ]
+                                        }
+                                    },
+                                    'count': {'$sum': 1}
+                                }
+                            }
+                        ],
+                        'current_day': [
+                            {
+                                '$match': {
+                                    'date': current_date
+                                }
+                            },
+                            {
+                                '$group': {
+                                    '_id': '$category_id',
+                                    'total_cost': {
+                                        '$sum': {
+                                            '$cond': [
+                                                {'$eq': ['$type', 'credit']},
+                                                '$amount',
+                                                {'$multiply': ['$amount', -1]}
+                                            ]
+                                        }
+                                    },
+                                    'count': {'$sum': 1}
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]))           
+            return {'message':"success",'budget_details':{"budget":transactions,'date':input_data['start_date']}}
+        except Exception as e:
+            return {'message':str(e)}
+        
     
     def get_recent_transactions_model(self,user_data):
         try:
