@@ -119,7 +119,7 @@ class transaction_model:
                                             {'$multiply': ['$amount', -1]}
                                         ]
                                     },
-                                    0
+                                    0.0
                                 ]
                             }
                         },
@@ -134,7 +134,7 @@ class transaction_model:
                                             {'$multiply': ['$amount', -1]}
                                         ]
                                     },
-                                    0
+                                    0.0
                                 ]
                             }
                         }
