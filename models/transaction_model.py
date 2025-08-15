@@ -146,7 +146,54 @@ class transaction_model:
         except Exception as e:
             return {'message':str(e)}
         
-    
+    def get_daily_transactions_model(self, input_data):
+        try:
+            target_date = dateutil.parser.parse(input_data['date'])
+            user_id = input_data['user_id']
+            
+            # Get transactions for the specific date
+            daily_transactions = list(mongo.db.transactions.find({
+                'user_id': user_id,
+                'date': target_date
+            }).sort('date', -1))
+            
+            # Process transactions and group by category
+            category_totals = {}
+            total_spent = 0
+            total_earned = 0
+            
+            for transaction in daily_transactions:
+                transaction['_id'] = str(transaction['_id'])
+                transaction['date'] = transaction['date'].isoformat()
+                
+                category_id = transaction['category_id']
+                amount = transaction['amount']
+                
+                if transaction['type'] == 'debit':
+                    total_spent += amount
+                    if category_id not in category_totals:
+                        category_totals[category_id] = {'debit': 0, 'credit': 0, 'count': 0}
+                    category_totals[category_id]['debit'] += amount
+                    category_totals[category_id]['count'] += 1
+                else:
+                    total_earned += amount
+                    if category_id not in category_totals:
+                        category_totals[category_id] = {'debit': 0, 'credit': 0, 'count': 0}
+                    category_totals[category_id]['credit'] += amount
+                    category_totals[category_id]['count'] += 1
+            
+            return {
+                'message': 'success',
+                'daily_transactions': daily_transactions,
+                'category_totals': category_totals,
+                'total_spent': total_spent,
+                'total_earned': total_earned,
+                'date': input_data['date']
+            }
+        except Exception as e:
+            return {'message': str(e)}
+        
+
     def get_recent_transactions_model(self,user_data):
         try:
             recent_transactions = list(mongo.db.transactions.find({
